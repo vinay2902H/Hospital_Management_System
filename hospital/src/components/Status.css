@@ -1,0 +1,206 @@
+.dashboard {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.appointments-section {
+    text-align: center;
+  width: 90%;
+  margin: 100px 0px 160px 60px;
+  max-width: 1200px;
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-x: auto; /* Allow horizontal scroll for smaller screens */
+}
+
+.banner h5 {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  table-layout: auto;
+}
+
+table thead {
+  background-color: #007bff;
+  color: white;
+  font-size: 16px;
+}
+
+table th,
+table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+table th {
+  text-transform: uppercase;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Appointment status styles */
+.value-pending {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.value-accepted {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.value-rejected {
+  color: #f44336;
+  font-weight: bold;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+  table th,
+  table td {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .appointments-section {
+    padding: 10px;
+  }
+
+  table thead {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Apply horizontal scroll for appointments-section */
+  .appointments-section {
+    overflow-x: auto; /* Allow horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    white-space: nowrap; /* Prevent text wrapping inside the section */
+  }
+
+  /* Apply horizontal scroll for banner */
+  .banner {
+    overflow-x: auto; /* Allow scrolling if content overflows */
+    white-space: nowrap; /* Prevent text wrapping */
+  }
+
+  table {
+    border: 0;
+    width: 100%; /* Ensure the table takes full width */
+    table-layout: auto; /* Keep the table in row format */
+  }
+
+  table caption {
+    font-size: 1.3em;
+  }
+
+  table thead {
+    display: table-header-group;
+  }
+
+  table tr {
+    display: table-row;
+  }
+
+  table td {
+    font-size: 14px;
+    text-align: left; /* Align data to the left */
+    border-bottom: 1px solid #ddd;
+  }
+
+  table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-left: 15px;
+    font-weight: bold;
+    text-align: left;
+  }
+
+  .banner h5 {
+    font-size: 18px;
+  }
+}
+
+/* Add horizontal scroll for 550px and 480px breakpoints */
+
+@media (max-width: 550px) {
+  /* Apply horizontal scroll for appointments-section */
+  .appointments-section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  /* Apply horizontal scroll for banner */
+  .banner {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  table {
+    border: 0;
+    width: 100%;
+    table-layout: auto;
+  }
+
+  table td {
+    font-size: 14px;
+    text-align: left;
+  }
+
+  .banner h5 {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Apply horizontal scroll for appointments-section */
+  .appointments-section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  /* Apply horizontal scroll for banner */
+  .banner {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  table {
+    border: 0;
+    width: 100%;
+    table-layout: auto;
+  }
+
+  table td {
+    font-size: 13px;
+    text-align: left;
+  }
+
+  .banner h5 {
+    font-size: 14px;
+  }
+}

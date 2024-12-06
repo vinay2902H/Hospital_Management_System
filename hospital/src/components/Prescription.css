@@ -1,0 +1,62 @@
+/* Prescription.css */
+
+.table-container {
+    margin: 100px auto; /* Center the container */
+    padding: 30px; /* Add some padding */
+    max-width: 800px; /* Set a maximum width */
+    background-color: #ffffff; /* White background for clarity */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Slightly more pronounced shadow */
+}
+
+h2 {
+    text-align: center; /* Center the heading */
+    color: #2c3e50; /* Dark blue color for the heading */
+    font-family: 'Arial', sans-serif; /* Font family */
+    margin-bottom: 20px; /* Space below the heading */
+    border-bottom: 2px solid #3498db; /* Underline effect */
+    padding-bottom: 10px; /* Space below the underline */
+}
+
+.prescription-details {
+    display: flex; /* Use flexbox for horizontal layout */
+    flex-direction: column; /* Stack items vertically */
+}
+
+.detail-row {
+    display: flex; /* Use flexbox for each row */
+    justify-content: space-between; /* Space out labels and values */
+    padding: 8px 0; /* Less padding between rows */
+    border-bottom: 1px solid #ecf0f1; /* Light gray border between rows */
+    transition: background-color 0.3s; /* Smooth background color change */
+}
+
+.detail-row:hover {
+    background-color: #f1f8ff; /* Light blue background on hover */
+}
+
+.detail-label {
+    font-weight: bold; /* Bold for labels */
+    color: #2980b9; /* Blue color for labels */
+}
+
+.detail-value {
+    color: #34495e; /* Darker color for values */
+    font-style: italic; /* Italic style for values */
+}
+
+.detail-row:last-child {
+    border-bottom: none; /* Remove border from the last row */
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 600px) {
+    .detail-row {
+        flex-direction: column; /* Stack vertically on small screens */
+        align-items: flex-start; /* Align items to the start */
+    }
+
+    .detail-row span {
+        margin-bottom: 5px; /* Space between label and value */
+    }
+}

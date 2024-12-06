@@ -1,0 +1,69 @@
+/* Call.css */
+
+/* Style for the container */
+.calback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Full-screen height */
+    background-color: #f5f7fa; /* Light background for contrast */
+    padding: 20px;
+}
+
+/* Title styling */
+.calback h1 {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+}
+
+/* Input field styling */
+.calback input {
+    width: 300px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+/* Focus state for input */
+.calback input:focus {
+    border-color: #007bff; /* Blue border on focus */
+}
+
+/* Button styling */
+.calback button {
+    width: 320px;
+    padding: 15px;
+    margin-top: 10px;
+    background-color: #007bff; /* Primary button color */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* Disabled button styling */
+.calback button:disabled {
+    background-color: #6c757d; /* Grey color when disabled */
+    cursor: not-allowed;
+}
+
+/* Hover state for button */
+.calback button:hover:not(:disabled) {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .calback input, .calback button {
+        width: 90%; /* Full width on small screens */
+    }
+}

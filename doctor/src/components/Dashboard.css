@@ -1,0 +1,267 @@
+/* General Styling */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #333;
+  }
+  
+  .dashboardpage {
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  /* Appointments Header Section */
+  .appointments-header {
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping to the next line */
+    justify-content: space-between; /* Spreads the boxes evenly */
+    margin-bottom: 20px;
+    gap: 10px;
+    overflow-x: auto; /* Enables horizontal scrolling */
+  }
+  
+  .appointments-header-box1,
+  .appointments-header-box2 {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    flex: 0 0 auto; /* Prevents boxes from shrinking */
+    min-width: 220px; /* Prevents boxes from shrinking too small */
+    max-width: calc(33.33% - 20px); /* Allows three boxes in one row with spacing */
+    border-left: 4px solid #007bff;
+  }
+  
+  .appointments-header-box1 h3 {
+    color: 	#1c1c84;
+    font-size: 1.4rem;
+  }
+  
+  .appointments-header-box1 p {
+    margin: 5px 0;
+    font-size: 1rem;
+    color: 	#113065;
+  }
+  
+  .appointments-header-box2 {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px;
+    text-align: center;
+    flex: 0 0 auto;
+    min-width: 220px;
+    max-width: calc(33.33% - 20px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .appointments-header-box2 h4 {
+    color:#0e345b;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+
+  
+  .appointments-summary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  
+  /* Appointments Section */
+  .appointments-section {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    overflow: hidden;
+  }
+  
+  .banner {
+    overflow-x: auto;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  thead {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .button-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  
+  
+  /* Responsive Design */
+  
+  /* For screens up to 900px */
+  @media screen and (max-width: 900px) {
+    .appointments-header {
+      flex-wrap: nowrap; /* Ensures boxes stay horizontally aligned */
+      overflow-x: auto; /* Enables horizontal scrolling */
+      gap: 20px; /* Increased gap between boxes */
+    }
+  
+    .appointments-header-box1, 
+    .appointments-header-box2 {
+      max-width: 100%; /* Allows boxes to use the full width */
+      margin: 10px 0; /* Vertical margin for separation */
+      
+    }
+  
+    .appointments-summary {
+      flex-direction: row; /* Keeps the summary boxes horizontal */
+      justify-content: space-between;
+    }
+  
+    table {
+      font-size: 14px;
+    }
+  
+    th, td {
+      padding: 10px;
+    }
+  }
+  
+  /* For screens up to 768px */
+  @media screen and (max-width: 768px) {
+    .appointments-header {
+      text-align: center;
+      overflow-x: auto; /* Enables horizontal scrolling */
+    }
+  
+    .appointments-summary {
+      flex-direction: row; /* Keeps summary boxes in one row */
+    }
+  
+    .banner {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+  
+    table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  
+    th, td {
+      font-size: 12px;
+      padding: 6px;
+    }
+  
+    .button-link {
+      font-size: 12px;
+    }
+  }
+  
+  /* For screens up to 576px */@media screen and (max-width: 576px) {
+  .appointments-header {
+  /* Temporary border for visibility */
+    flex-direction: column;  /* Stacks the header boxes vertically */
+    align-items: center;     /* Center aligns the items in the header */
+    padding: 10px;           /* Adds some padding around the header */
+  }
+
+  /* Stacking boxes vertically with full width on smaller screens */
+  .appointments-header-box1,
+  .appointments-header-box2 {
+    text-align: center;      /* Centers the content inside each box */
+    align-items: center;     /* Centers content inside boxes (no effect needed here) */
+    width: 100%;             /* Make sure the boxes take full width */
+    margin: 5px 0;          /* Adds some space between each box */
+    box-sizing: border-box;  /* Ensures padding/margins don't overflow */
+  }
+
+  /* Banner section with horizontal scrolling if needed */
+  .banner {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Table styling for smaller screens */
+  table {
+    font-size: 12px;         /* Smaller font size for better readability */
+    width: 100%;             /* Ensure the table takes full width */
+    table-layout: fixed;     /* Helps in making the table more responsive */
+  }
+
+  th, td {
+    padding: 6px;            /* Reduced padding for small screens */
+    text-align: left;        /* Keeps text aligned to the left */
+  }
+
+  /* Optional: Adjusting button link style */
+  .button-link {
+    font-size: 12px;         /* Smaller button text on mobile */
+  }
+}
+
+
+
+
+.link-button {
+    display: inline-block; /* Allows padding and margin to be applied */
+    padding: 10px 20px; /* Adds space around the text */
+    font-size: 1em; /* Sets font size */
+    color: #fff; /* Text color */
+    background-color:#007bff; /* Button background color */
+    border: none; /* Removes default border */
+    border-radius: 4px; /* Rounds the corners */
+    text-decoration: none; /* Removes underline */
+    text-align: center; /* Centers text */
+    cursor: pointer; /* Changes the cursor on hover */
+    transition: background-color 0.3s; /* Adds a smooth transition for hover effect */
+  }
+  
+  .link-button:hover {
+    background-color: #0056b3; /* Darker background color on hover */
+  }
+  .button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: 	#03256c; /* Primary blue color */
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Adds a shadow effect */
+  }
+  
+  .button-link:hover {
+    background-color: #0056b3; /* Darker shade of blue on hover */
+    transform: translateY(-2px); /* Slight lift on hover */
+  }
+  
+  .button-link:active {
+    background-color: #003f7f; /* Even darker shade on click */
+    transform: translateY(1px); /* Pressed-down effect */
+  }
+  .banner h5{
+    text-align: center;
+    font-size: 1.5rem;
+  }
