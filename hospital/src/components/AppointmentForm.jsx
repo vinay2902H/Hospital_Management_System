@@ -1,31 +1,27 @@
+import React, { useEffect, useContext, useState } from "react";
 import axios from "axios";
-import React, { useEffect, useContext } from "react";
-import { useState } from "react";
 import { toast } from "react-toastify";
-import { Context } from "../index";  // Make sure Context is imported
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
+import { Context } from "../index"; // Ensure Context is correctly imported
 
 const AppointmentForm = () => {
-  const { isAuthenticated } = useContext(Context);  // Make sure user is authenticated
+  const { isAuthenticated } = useContext(Context);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [nic, setNic] = useState("");  // Default NIC is empty
+  const [nic, setNic] = useState("");
   const [dob, setDob] = useState("");
   const [gender, setGender] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [department, setDepartment] = useState("Pediatrics");
   const [doctorFirstName, setDoctorFirstName] = useState("");
-  const [Medication_Name, setMedication_Name] = useState("");
-  const [Dosage, setDosage] = useState("");
-  const [Frequency, setFrequency] = useState("");
-  const [Duration_of_Treatment, setDuration_of_Treatment] = useState("");
-  const [Special_Instructions, setSpecial_Instructions] = useState("");
   const [doctorLastName, setDoctorLastName] = useState("");
   const [address, setAddress] = useState("");
   const [hasVisited, setHasVisited] = useState(false);
+  const [doctors, setDoctors] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const departmentsArray = [
     "Pediatrics",
@@ -39,31 +35,24 @@ const AppointmentForm = () => {
     "ENT",
   ];
 
-  const [doctors, setDoctors] = useState([]);
-  
   useEffect(() => {
-    // Fetch user data to retrieve NIC and other info
     const fetchUserData = async () => {
       try {
         const { data } = await axios.get("http://localhost:4000/api/v1/user/patient/me", {
           withCredentials: true,
         });
-        // Set the NIC and other fields if available
-        setNic(data.user.nic || "");  // Set NIC from API response if available
-        const formattedDob = new Date(data.user.dob).toISOString().split('T')[0];
+        setNic(data.user.nic || "");
         setFirstName(data.user.firstName || "");
         setLastName(data.user.lastName || "");
         setEmail(data.user.email || "");
         setPhone(data.user.phone || "");
+        setDob(new Date(data.user.dob).toISOString().split("T")[0]);
         setGender(data.user.gender);
-        setDob(formattedDob);
-      
       } catch (error) {
         toast.error("Failed to fetch user data.");
       }
     };
 
-    // Fetch doctors list
     const fetchDoctors = async () => {
       try {
         const { data } = await axios.get("http://localhost:4000/api/v1/user/doctors", {
@@ -76,196 +65,171 @@ const AppointmentForm = () => {
     };
 
     if (isAuthenticated) {
-      fetchUserData();  // Fetch user data if authenticated
+      fetchUserData();
     }
-
-    fetchDoctors();  // Always fetch doctors list
+    fetchDoctors();
   }, [isAuthenticated]);
 
-  // Handling appointment submission
   const handleAppointment = async (e) => {
     e.preventDefault();
-    
+  
+    if (!appointmentDate || !doctorFirstName || !doctorLastName) {
+      toast.error("Please fill in all the required fields.");
+      return;
+    }
+  
+    // Check if the appointment date is in the past
+    // if (new Date(appointmentDate) < new Date()) {
+    //   toast.error("Appointment date cannot be in the past.");
+    //   return;
+    // }
+  
+    setIsLoading(true);
+  
     try {
-      const hasVisitedBool = Boolean(hasVisited);
-      const { data } = await axios.post(
-        "http://localhost:4000/api/v1/appointment/post",
+      // First, check the availability of the doctor by sending the appointment date
+      const { data: appoint } = await axios.post(
+        "http://localhost:4000/api/v1/appointment/check-availability",
         {
-          firstName,
-          lastName,
-          email,
-          phone,
-          nic,
-          dob,
-          gender,
-          appointment_date: appointmentDate,
-          department,
           doctor_firstName: doctorFirstName,
           doctor_lastName: doctorLastName,
-          Medication_Name,
-          Dosage,
-          Frequency,
-          Duration_of_Treatment,
-          Special_Instructions,
-          hasVisited: hasVisitedBool,
-          address,
+          appointment_date: appointmentDate,
         },
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
         }
       );
-      toast.success(data.message);
-      // Reset form fields
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setPhone("");
-      setNic("");  // Clear nic after submission
-      setDob("");
-      setGender("");
-      setAppointmentDate("");
-      setDepartment("");
-      setDoctorFirstName("");
-      setDoctorLastName("");
-      setHasVisited(false);
-      setAddress("");
-       console.log(dob);
+  
+      // Check if doctor availability data exists and handle doctor-to date comparison
+      if (appoint.available) {
+        const doctorAvailabilityFrom = new Date(appoint.fromDate); // Doctor's availability start date
+        const doctorAvailabilityTo = new Date(appoint.toDate); // Doctor's availability end date
+  
+        // Compare appointment date with the doctor's availability range
+        if (new Date(appointmentDate) < doctorAvailabilityFrom || new Date(appointmentDate) > doctorAvailabilityTo) {
+          toast.error(`The selected doctor is not available on ${appointmentDate}. Available dates: ${doctorAvailabilityFrom.toLocaleDateString()} - ${doctorAvailabilityTo.toLocaleDateString()}.`);
+          setIsLoading(false);
+          return;
+        }
+  
+        // Proceed with booking the appointment if date is valid
+        const { data } = await axios.post(
+          "http://localhost:4000/api/v1/appointment/post",
+          {
+            firstName,
+            lastName,
+            email,
+            phone,
+            nic,
+            dob,
+            gender,
+            appointment_date: appointmentDate,
+            department,
+            doctor_firstName: doctorFirstName,
+            doctor_lastName: doctorLastName,
+            address,
+            hasVisited: Boolean(hasVisited),
+          },
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+  
+        toast.success(data.message || "Appointment booked successfully!");
+      
+      } else {
+        toast.error(appoint.message || "The selected doctor is not available on this date.");
+        setIsLoading(false);
+      }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred.");
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-
+  
   return (
-    <>
-      <div className="container form-component appointment-form">
-        <h2>Appointment</h2>
-        <form onSubmit={handleAppointment}>
-          <div>
-            <input
-              type="text"
-              placeholder="First Name"
-              value={firstName}
-              disabled
-              // onChange={(e) => setFirstName(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Last Name"
-              value={lastName}
-              disabled
-              onChange={(e) => setLastName(e.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type="text"
-              placeholder="Email"
-              value={email}
-              disabled
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Mobile Number"
-              value={phone}
-              disabled
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-          <div>
-            <input
-              type="text"
-              placeholder="ID"
-              value={nic}  // Use the nic from context or state
-              disabled
-              onChange={(e) => setNic(e.target.value)}  // Allow updating the NIC if needed
-            />
-            <input
-              type="date"
-              placeholder="Date of Birth"
-              value={dob}
-              disabled
-              onChange={(e) => setDob(e.target.value)}
-            />
-          </div>
-          <div>
-            <input text="text" value={gender} onChange={(e) => setGender(e.target.value)} disabled/>
-              
-            
-            <input
-              type="date"
-              placeholder="Appointment Date"
-              value={appointmentDate}
-              onChange={(e) => setAppointmentDate(e.target.value)}
-            />
-          </div>
-          <div>
-            <select
-              value={department}
-              onChange={(e) => {
-                setDepartment(e.target.value);
-                setDoctorFirstName("");
-                setDoctorLastName("");
-              }}
-            >
-              {departmentsArray.map((depart, index) => (
-                <option value={depart} key={index}>
-                  {depart}
-                </option>
-              ))}
-            </select>
-            <select
-              value={`${doctorFirstName} ${doctorLastName}`}
-              onChange={(e) => {
-                const [firstName, lastName] = e.target.value.split(" ");
-                setDoctorFirstName(firstName);
-                setDoctorLastName(lastName);
-              }}
-              disabled={!department}
-            >
-              <option value="">Select Doctor</option>
-              {doctors
-                .filter((doctor) => doctor.doctorDepartment === department)
-                .map((doctor, index) => (
-                  <option
-                    value={`${doctor.firstName} ${doctor.lastName}`}
-                    key={index}
-                  >
-                    {doctor.firstName} {doctor.lastName}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <textarea
-            rows="10"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Address"
+    <div className="container form-component appointment-form">
+      <h2>Appointment</h2>
+      <form onSubmit={handleAppointment}>
+        <div>
+          <input type="text" placeholder="First Name" value={firstName} disabled />
+          <input type="text" placeholder="Last Name" value={lastName} disabled />
+        </div>
+        <div>
+          <input type="text" placeholder="Email" value={email} disabled />
+          <input type="number" placeholder="Mobile Number" value={phone} disabled />
+        </div>
+        <div>
+          <input type="text" placeholder="ID" value={nic} disabled />
+          <input type="date" placeholder="Date of Birth" value={dob} disabled />
+        </div>
+        <div>
+          <input type="text" value={gender} disabled />
+          <input
+            type="date"
+            placeholder="Appointment Date"
+            value={appointmentDate}
+            onChange={(e) => setAppointmentDate(e.target.value)}
           />
-          <div
-            style={{
-              gap: "10px",
-              justifyContent: "flex-end",
-              flexDirection: "row",
+        </div>
+        <div>
+          <select
+            value={department}
+            onChange={(e) => {
+              setDepartment(e.target.value);
+              setDoctorFirstName("");
+              setDoctorLastName("");
             }}
           >
-            <p style={{ marginBottom: 0 }}>Have you visited before?</p>
+            {departmentsArray.map((dep, index) => (
+              <option value={dep} key={index}>
+                {dep}
+              </option>
+            ))}
+          </select>
+          <select
+            value={`${doctorFirstName} ${doctorLastName}`}
+            onChange={(e) => {
+              const [firstName, lastName] = e.target.value.split(" ");
+              setDoctorFirstName(firstName);
+              setDoctorLastName(lastName);
+            }}
+            disabled={!department}
+          >
+            <option value="">Select Doctor</option>
+            {doctors
+              .filter((doc) => doc.doctorDepartment === department)
+              .map((doc, index) => (
+                <option value={`${doc.firstName} ${doc.lastName}`} key={index}>
+                  {doc.firstName} {doc.lastName}
+                </option>
+              ))}
+          </select>
+        </div>
+        <textarea
+          rows="4"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder="Address"
+        />
+        <div>
+          <label>
             <input
               type="checkbox"
               checked={hasVisited}
               onChange={(e) => setHasVisited(e.target.checked)}
-              style={{ flex: "none", width: "25px" }}
             />
-          </div>
-          <button style={{ margin: "0 auto" }}>GET APPOINTMENT</button>
-        </form>
-      </div>
-    </>
+            Have you visited before?
+          </label>
+        </div>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Booking..." : "Book Appointment"}
+        </button>
+      </form>
+    </div>
   );
 };
 

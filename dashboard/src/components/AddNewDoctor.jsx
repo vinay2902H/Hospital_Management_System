@@ -18,6 +18,9 @@ const AddNewDoctor = () => {
   const [doctorDepartment, setDoctorDepartment] = useState("");
   const [docAvatar, setDocAvatar] = useState("");
   const [docAvatarPreview, setDocAvatarPreview] = useState("");
+  const[to ,setTo]=useState("");
+  const[from,setFrom]=useState("");
+
 
   const navigateTo = useNavigate();
 
@@ -57,6 +60,8 @@ const AddNewDoctor = () => {
       formData.append("gender", gender);
       formData.append("doctorDepartment", doctorDepartment);
       formData.append("docAvatar", docAvatar);
+      formData.append("from",from);
+      formData.append("to",to);
       await axios
         .post("http://localhost:4000/api/v1/user/doctor/addnew", formData, {
           withCredentials: true,
@@ -74,6 +79,8 @@ const AddNewDoctor = () => {
           setDob("");
           setGender("");
           setPassword("");
+          setFrom("");
+          setTo("");
         });
     } catch (error) {
       toast.error(error.response.data.message);
@@ -136,6 +143,18 @@ const AddNewDoctor = () => {
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
               />
+               <input
+                type={"date"}
+                placeholder="from"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+              />
+                <input
+                type={"date"}
+                placeholder="To"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+              />
               <select
                 value={gender}
                 onChange={(e) => setGender(e.target.value)}
@@ -165,6 +184,8 @@ const AddNewDoctor = () => {
                   );
                 })}
               </select>
+             
+
               <button type="submit">Register New Doctor</button>
             </div>
           </div>

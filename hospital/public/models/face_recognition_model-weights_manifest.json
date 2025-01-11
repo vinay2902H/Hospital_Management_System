@@ -1,0 +1,26 @@
+{
+    "weightsManifest": [
+      {
+        "name": "face_recognition_model",
+        "layers": [
+          {
+            "name": "conv1",
+            "shape": [1, 3, 3, 64],
+            "type": "conv2d",
+            "data": "/models/face_recognition_model-weights.bin"
+          },
+          {
+            "name": "conv2",
+            "shape": [1, 3, 3, 128],
+            "type": "conv2d",
+            "data": "/models/face_recognition_model-weights.bin"
+          }
+        ]
+      }
+    ]
+  }
+  
+
+
+
+  

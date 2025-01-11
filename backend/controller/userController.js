@@ -4,23 +4,25 @@ import ErrorHandler from "../middlewares/error.js";
 import { generateToken } from "../utils/jwtToken.js";
 import cloudinary from "cloudinary";
 
+// Patient Registration with Face Recognition
 export const patientRegister = catchAsyncErrors(async (req, res, next) => {
-  const { firstName, lastName, email, phone, nic, dob, gender, password } =
-    req.body;
+  const { 
+    firstName, 
+    lastName, 
+    email, 
+    phone, 
+    nic, 
+    dob, 
+    gender, 
+    password, 
+    faceDescriptors 
+  } = req.body;
+
   if (
-    !firstName ||
-    !lastName ||
-    !email ||
-    !phone ||
-    !nic ||
-    !dob ||
-    !gender ||
-    !password
+    !firstName || !lastName || !email || !phone || 
+    !nic || !dob || !gender || !password || !faceDescriptors
   ) {
-    return next(new ErrorHandler("Please Fill Full Form!", 400));
-
-
-    
+    return next(new ErrorHandler("Please Fill Full Form, including Face Data!", 400));
   }
 
   const isRegistered = await User.findOne({ email });
@@ -37,31 +39,65 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     dob,
     gender,
     password,
+    faceDescriptors,
     role: "Patient",
   });
   generateToken(user, "User Registered!", 200, res);
 });
 
+// Login with Password or Face Recognition
 export const login = catchAsyncErrors(async (req, res, next) => {
-  const { email, password,  role } = req.body;
-  if (!email || !password || !role) {
-    return next(new ErrorHandler("Please Fill Full Form!", 400));
-  }
- 
-  const user = await User.findOne({ email }).select("+password");
-  if (!user) {
-    return next(new ErrorHandler("Invalid Email Or Password!", 400));
+  const { email, password, faceDescriptors, role } = req.body;
+
+  if (!email || (!password && !faceDescriptors) || !role) {
+    return next(new ErrorHandler("Please Provide Email and Either Password or Face Data!", 400));
   }
 
-  const isPasswordMatch = await user.comparePassword(password);
-  if (!isPasswordMatch) {
-    return next(new ErrorHandler("Invalid Email Or Password!", 400));
+  const user = await User.findOne({ email }).select("+password");
+  if (!user) {
+    return next(new ErrorHandler("Invalid Email or Password!", 400));
   }
+
   if (role !== user.role) {
-    return next(new ErrorHandler(`User Not Found With This Role!`, 400));
+    return next(new ErrorHandler("User Not Found With This Role!", 400));
   }
-  generateToken(user, "Login Successfully!", 201, res);
+
+  if (password) {
+    const isPasswordMatch = await user.comparePassword(password);
+    if (!isPasswordMatch) {
+      return next(new ErrorHandler("Invalid Email or Password!", 400));
+    }
+  } else if (faceDescriptors) {
+    const isFaceMatch = await matchFaceDescriptors(user.faceDescriptors, faceDescriptors);
+    if (!isFaceMatch) {
+      return next(new ErrorHandler("Face Not Recognized!", 400));
+    }
+  }
+
+  generateToken(user, "Login Successfully!", 200, res);
 });
+
+// Helper Function to Match Face Descriptors
+const matchFaceDescriptors = async (storedDescriptors, inputDescriptors) => {
+  if (!storedDescriptors || storedDescriptors.length === 0) return false;
+
+  for (let descriptor of storedDescriptors) {
+    const distance = calculateEuclideanDistance(descriptor, inputDescriptors);
+    if (distance < 0.6) return true; // 0.6 is a common threshold for face recognition
+  }
+  return false;
+};
+
+// Calculate Euclidean Distance Between Two Vectors
+const calculateEuclideanDistance = (vector1, vector2) => {
+  let sum = 0;
+  for (let i = 0; i < vector1.length; i++) {
+    sum += (vector1[i] - vector2[i]) ** 2;
+  }
+  return Math.sqrt(sum);
+};
+
+
 
 export const addNewAdmin = catchAsyncErrors(async (req, res, next) => {
   const { firstName, lastName, email, phone, nic, dob, gender, password } =
@@ -121,6 +157,8 @@ export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
     gender,
     password,
     doctorDepartment,
+    from,
+    to,
   } = req.body;
   if (
     !firstName ||
@@ -132,7 +170,9 @@ export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
     !gender ||
     !password ||
     !doctorDepartment ||
-    !docAvatar
+    !docAvatar||
+    !from||
+    !to
   ) {
     return next(new ErrorHandler("Please Fill Full Form!", 400));
   }
@@ -169,6 +209,8 @@ export const addNewDoctor = catchAsyncErrors(async (req, res, next) => {
       public_id: cloudinaryResponse.public_id,
       url: cloudinaryResponse.secure_url,
     },
+    from,
+    to,
   });
   res.status(200).json({
     success: true,
@@ -243,3 +285,39 @@ export const logoutDoctor = catchAsyncErrors(async (req, res, next) => {
       message: "Doctor Logged Out Successfully.",
     });
 });
+
+// In appointmentController.js// userController.js
+
+// Function to update doctor's availability
+// Backend route for updating availability based on NIC
+export const updateDoctorAvailability = async (req, res) => {
+  try {
+    const { doc } = req.params; // Get doctor's NIC from the route params
+    const { availabilityFromDate, availabilityToDate } = req.body; // Get the dates from the request body
+    console.log(doc);
+    console.log(req.params);
+    if (!availabilityFromDate || !availabilityToDate) {
+      return res.status(400).json({ message: "Both dates must be provided." });
+    }
+
+    // Find the doctor by NIC and update the availability
+    const doctor = await User.findOneAndUpdate(
+      { nic: doc }, // Find doctor by NIC
+      { $set: { from:availabilityFromDate, to:availabilityToDate } }, // Use $set to update specific fields
+      { new: true } // Return the updated doctor document
+    );
+    
+
+    if (!doctor) {
+      return res.status(404).json({ message: 'Doctor not found.' });
+    }
+
+    return res.status(200).json({
+      message: 'Doctor availability updated successfully.',
+      doctor, // Return the updated doctor document
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};

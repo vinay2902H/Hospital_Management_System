@@ -9,6 +9,8 @@ import {
   updateAppointmentprescription,
   getdocappointments,
   getprescription,
+  avil,
+
   
 } from "../controller/appointmentController.js";
 import {
@@ -32,5 +34,7 @@ router.put("/updateprescription/:appointmentId",updateAppointmentprescription);
 router.get("/getappointment/:getappointmentid",isDoctorAuthenticated,getdocappointments);
 router.put("/update/:id", isDoctorAuthenticated, updateAppointmentStatus);
 router.delete("/delete/:id", isAdminAuthenticated, deleteAppointment);
+router.post("/check-availability",avil)
+
 
 export default router;

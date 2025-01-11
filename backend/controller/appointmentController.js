@@ -313,3 +313,98 @@ export const deleteAppointment = catchAsyncErrors(async (req, res, next) => {
     message: "Appointment Deleted!",
   });
 });
+
+
+  // Assuming you have an Appointment model
+  export const avil = catchAsyncErrors(async (req, res) => {
+  const { doctor_firstName, doctor_lastName, appointment_date } = req.body;
+
+  try {
+    // Find the doctor by first and last name
+    const doctor = await User.findOne({
+      firstName: doctor_firstName,
+      lastName: doctor_lastName,
+    });
+
+    console.log("Doctor Details:", doctor);
+
+    // If doctor is not found
+    if (!doctor) {
+      return res.status(400).json({
+        available: false,
+        message: "Doctor not found.",
+      });
+    }
+
+    // Ensure all required fields are present
+    if (!appointment_date || !doctor.from || !doctor.to) {
+      return res.status(400).json({
+        available: false,
+        message: "Doctor's availability details or appointment date are missing or incorrect.",
+      });
+    }
+
+    // Parse dates
+    const doctorAvailabilityStart = new Date(doctor.from);
+    const doctorAvailabilityEnd = new Date(doctor.to);
+    const appointmentDate = new Date(appointment_date);
+
+    console.log("Parsed Dates:", {
+      appointmentDate: appointmentDate.toISOString(),
+      doctorAvailabilityStart: doctorAvailabilityStart.toISOString(),
+      doctorAvailabilityEnd: doctorAvailabilityEnd.toISOString(),
+    });
+
+    // Validate dates
+    if (
+      isNaN(appointmentDate.getTime()) ||
+      isNaN(doctorAvailabilityStart.getTime()) ||
+      isNaN(doctorAvailabilityEnd.getTime())
+    ) {
+      console.error("One or more dates are invalid.");
+      return res.status(400).json({ message: "Invalid date provided." });
+    }
+
+    // Compare appointment date with doctor's availability
+    if (
+      appointmentDate.getTime() < doctorAvailabilityStart.getTime() ||
+      appointmentDate.getTime() > doctorAvailabilityEnd.getTime()
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "The selected appointment date is not availabile for Doctor.",
+      });
+    }
+
+    console.log("Appointment date is within the doctor's availability range.");
+
+    // Check if the appointment date is already booked
+    const existingAppointment = await Appointment.findOne({
+      appointment_date: appointmentDate.toISOString().split("T")[0], // Assuming date-only comparison
+    });
+
+    if (existingAppointment) {
+      console.log("Appointment already booked on this date.");
+      return res.status(400).json({
+        available: false,
+        message: "The selected appointment date is already booked.",
+      });
+    }
+
+    // Doctor is available
+    return res.status(200).json({
+      available: true,
+      message: "Doctor is available for the appointment.",
+    });
+  } catch (error) {
+    console.error("Error checking doctor availability:", error.message || error);
+    return res.status(500).json({
+      available: false,
+      message: "An error occurred while checking availability.",
+    });
+  }
+});
+
+
+
+// In your doctor controller (e.g., doctorController.js)

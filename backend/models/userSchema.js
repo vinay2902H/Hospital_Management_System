@@ -51,15 +51,26 @@ const userSchema = new mongoose.Schema({
     required: [true, "User Role Required!"],
     enum: ["Patient", "Doctor", "Admin"],
   },
-  doctorDepartment:{
+  doctorDepartment: {
     type: String,
   },
   docAvatar: {
     public_id: String,
     url: String,
   },
+  from: {
+    type: Date,
+  },
+  to: {
+    type: Date,
+  },
+  faceDescriptors: {
+    type: [Number], // Array of numbers to store face descriptors
+    select: false, // Prevent sending sensitive data in API responses by default
+  },
 });
 
+// Pre-save middleware to hash password
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
@@ -67,13 +78,15 @@ userSchema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
+// Method to compare passwords
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// Method to generate a JWT
 userSchema.methods.generateJsonWebToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET_KEY, {
-    expiresIn:5000,
+    expiresIn: 5000,
   });
 };
 
