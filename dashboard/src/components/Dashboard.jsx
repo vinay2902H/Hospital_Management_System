@@ -12,14 +12,14 @@ const Dashboard = () => {
   const [appointmentsCount, setAppointmentsCount] = useState(0); // State to store appointments count
   const [doctorsCount, setDoctorsCount] = useState(0); // State to store doctors count
 
-  const baseUrl = "http://localhost:4000/api"; // Backend base URL
+  const baseUrl = "https://hospital-management-system-e1xj.onrender.com/api"; // Backend base URL
 
   // Fetch appointments
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:4000/api/v1/appointment/getall",
+          "https://hospital-management-system-e1xj.onrender.com/api/v1/appointment/getall",
           { withCredentials: true }
         );
         setAppointments(data.appointments);
@@ -38,7 +38,7 @@ const Dashboard = () => {
     const fetchDoctors = async () => {
       try {
         const { data } = await axios.get(
-          "http://localhost:4000/api/v1/user/doctors",
+          "https://hospital-management-system-e1xj.onrender.com/api/v1/user/doctors",
           { withCredentials: true }
         );
         setDoctors(data.doctors);
@@ -55,7 +55,7 @@ const Dashboard = () => {
     const handleUpdateStatus = async (appointmentId, status) => {
   try {
     const { data } = await axios.put(
-      `http://localhost:4000/api/v1/appointment/update/${appointmentId}`,
+      `https://hospital-management-system-e1xj.onrender.com/api/v1/appointment/update/${appointmentId}`,
       { status },
       { withCredentials: true }
     );
@@ -125,7 +125,7 @@ const Dashboard = () => {
       }
   
       // Send email
-      const response = await fetch(`http://localhost:4000/api/email/sendEmail`, {
+      const response = await fetch(`https://hospital-management-system-e1xj.onrender.com/api/email/sendEmail`, {
         method: "POST",
         body: JSON.stringify(emailData),
         headers: {
