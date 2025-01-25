@@ -16,13 +16,7 @@ import emailRouter from "./router/emailRoutes.js"; // Add `.js` extension
 const app = express();
 config({ path: "./config.env" });
 
-const allowedOrigins = ["https://rgukthospital-site.netlify.app", "https://rgukthospital-admin.netlify.app","https://rgukthospital-doctors.netlify.app","https://remarkable-sprinkles-2a5027.netlify.app"];
-
-const allowedOrigins = [
-  'https://rgukthospital-doctors.netlify.app',
-  'https://rgukthospital-admin.netlify.app',
-  'https://rgukthospital-site.netlify.app',
-];
+const allowedOrigins = ["https://rgukthospital-site.netlify.app", "https://rgukthospital-admin.netlify.app","https://rgukthospital-doctors.netlify.app","https://hospital-officals.netlify.app"];
 
 app.use(cors({
   origin: function (origin, callback) {
