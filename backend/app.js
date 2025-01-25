@@ -18,11 +18,18 @@ config({ path: "./config.env" });
 
 const allowedOrigins = ["https://rgukthospital-site.netlify.app", "https://rgukthospital-admin.netlify.app","https://rgukthospital-doctors.netlify.app","https://remarkable-sprinkles-2a5027.netlify.app"];
 
+const allowedOrigins = [
+  'https://rgukthospital-doctors.netlify.app',
+  'https://rgukthospital-admin.netlify.app',
+  'https://rgukthospital-site.netlify.app',
+];
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
+    // Check if the origin is in the allowedOrigins list
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = 'The CORS policy for this site does not ' +
                   'allow access from the specified Origin.';
@@ -32,6 +39,7 @@ app.use(cors({
   },
   credentials: true, // Allow credentials (cookies, etc.)
 }));
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
