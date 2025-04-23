@@ -14,15 +14,14 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     nic, 
     dob, 
     gender, 
-    password, 
-    faceDescriptors 
+    password,
   } = req.body;
 
   if (
     !firstName || !lastName || !email || !phone || 
-    !nic || !dob || !gender || !password || !faceDescriptors
+    !nic || !dob || !gender || !password 
   ) {
-    return next(new ErrorHandler("Please Fill Full Form, including Face Data!", 400));
+    return next(new ErrorHandler("Please Fill Full Form !", 400));
   }
 
   const isRegistered = await User.findOne({ email });
@@ -39,7 +38,6 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
     dob,
     gender,
     password,
-    faceDescriptors,
     role: "Patient",
   });
   generateToken(user, "User Registered!", 200, res);
@@ -47,10 +45,10 @@ export const patientRegister = catchAsyncErrors(async (req, res, next) => {
 
 // Login with Password or Face Recognition
 export const login = catchAsyncErrors(async (req, res, next) => {
-  const { email, password, faceDescriptors, role } = req.body;
+  const { email, password, role } = req.body;
 
-  if (!email || (!password && !faceDescriptors) || !role) {
-    return next(new ErrorHandler("Please Provide Email and Either Password or Face Data!", 400));
+  if (!email || !password || !role) {
+    return next(new ErrorHandler("Please Provide Email and Either Password !", 400));
   }
 
   const user = await User.findOne({ email }).select("+password");
@@ -67,26 +65,11 @@ export const login = catchAsyncErrors(async (req, res, next) => {
     if (!isPasswordMatch) {
       return next(new ErrorHandler("Invalid Email or Password!", 400));
     }
-  } else if (faceDescriptors) {
-    const isFaceMatch = await matchFaceDescriptors(user.faceDescriptors, faceDescriptors);
-    if (!isFaceMatch) {
-      return next(new ErrorHandler("Face Not Recognized!", 400));
-    }
-  }
-
+  } 
   generateToken(user, "Login Successfully!", 200, res);
 });
 
 // Helper Function to Match Face Descriptors
-const matchFaceDescriptors = async (storedDescriptors, inputDescriptors) => {
-  if (!storedDescriptors || storedDescriptors.length === 0) return false;
-
-  for (let descriptor of storedDescriptors) {
-    const distance = calculateEuclideanDistance(descriptor, inputDescriptors);
-    if (distance < 0.6) return true; // 0.6 is a common threshold for face recognition
-  }
-  return false;
-};
 
 // Calculate Euclidean Distance Between Two Vectors
 const calculateEuclideanDistance = (vector1, vector2) => {
