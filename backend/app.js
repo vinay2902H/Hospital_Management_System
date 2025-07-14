@@ -17,6 +17,9 @@ const app = express();
 config({ path: "./config.env" });
 
 const allowedOrigins = ["https://rgukthospital-site.netlify.app", "https://rgukthospital-admin.netlify.app","https://rgukthospital-doctors.netlify.app","http://localhost:3000"];
+app.get("/ping", (req, res) => {
+  res.status(200).send("Server is awake and healthy!");
+});
 
 app.use(cors({
   origin: function (origin, callback) {
